@@ -1,0 +1,47 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
+#include "CNetStatics.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class UCNetStatics : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+public:
+	static FOnlineSessionSettings GenerateOnlineSessionSettings(const FName& SessionName, const FString& SessionSearchId, int Port);
+	static IOnlineSessionPtr GetSessionPtr();
+	static IOnlineIdentityPtr GetIdentityPtr();
+
+	static uint8 GetPlayerCountPerTeam();
+	static bool IsSessionServer(const UObject* WorldContextobject);
+
+	static  FString GetSessionNameStr();
+	static  FName GetSessionNameKey();
+
+	static FString GetSessionSearchIdStr();
+	static FName GetSessionSearchIdKey();
+
+	static int GetSessionPort();
+	static FName GetPortKey();
+
+	static FName GetCoordinatorURLKey();
+	static FString GetCoordinatorURL();
+	static FString GetDefaultCoordinatorURL();
+	
+	static FString GetCommandlineArgAsString(const FName& ParamName);
+	static int GetCommandlineArgAsint(const FName& ParamName);
+
+	static FString GetTestingURL();
+	static FName GetTestingURLKey();
+
+	static void ReplacePort(FString& OutURLStr, int NewPort);
+	
+};

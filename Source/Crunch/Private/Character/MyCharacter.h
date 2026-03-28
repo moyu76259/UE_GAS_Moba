@@ -1,0 +1,172 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GAS/CGameplayAbilityTypes.h"
+#include "GameFramework/Character.h"
+#include "GameplayEffectTypes.h"
+#include "AbilitySystemInterface.h"
+#include "GameplayTagContainer.h"
+#include "GenericTeamAgentInterface.h"
+#include "Widgets/RenderActorTargetInterface.h"
+#include "MyCharacter.generated.h"
+
+
+UCLASS()
+class AMyCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface, public IRenderActorTargetInterface
+{
+	GENERATED_BODY()
+
+public:
+	// Sets default values for this character's properties
+	AMyCharacter();
+	void ServerSideInit();
+	void ClientSideInit();
+	bool IsLocallyControlledByPlayer() const;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	const TMap<ECAbilityInputID, TSubclassOf<UGameplayAbility>>& GetAbilities() const;
+
+	virtual FVector GetCaptureLocalPosition() const override;
+	virtual FRotator GetCaptureLocalRotation() const override;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Capture")
+	FVector HeadshotCaptureLocalPosition;
+
+	UPROPERTY(EditDefaultsOnly, Category="Capture")
+	FRotator HeadshotCaptureLocalRotation;
+	
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	//Only called on the server
+	virtual void PossessedBy(AController* NewController) override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+    /********************************************************************/
+    /*                        Gameplay Ability                          */
+	/********************************************************************/
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SendGameplayEventToSelf(const FGameplayTag& EventTag, const FGameplayEventData& EventData);
+
+	FORCEINLINE bool GetIsInFocusMode() const {return bIsFocusMode; }
+
+protected:
+	void UpgradeAbilityWithInputID(ECAbilityInputID InputID);
+private:
+	
+    void BindGASChangeDelegates();
+	void DeathTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	void StunTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	void AimTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	void FocusTagUpdated(const FGameplayTag Tag, int32 NewCount);
+	bool bIsFocusMode = false;
+	void SetIsAimming(bool bIsAiming);
+	virtual void OnAimStateChanged(bool bIsAimming);
+	void MoveSpeedUpdated(const FOnAttributeChangeData& Data);
+	void MaxHealthUpdated(const FOnAttributeChangeData& Data);
+	void MaxManaUpdated(const FOnAttributeChangeData& Data);
+	
+	
+	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
+	class UCAbilitySystemComponent* CAbilitySystemComponent;
+	
+	UPROPERTY()
+	class UCAttributeSet* CAttributeSet;
+	
+	/********************************************************************/
+	/*                               UI                                 */
+	/********************************************************************/
+private:
+	UPROPERTY(VisibleDefaultsOnly, Category = "Gameplay Ability")
+	class UWidgetComponent* OverHeadWidgetComponent;
+
+	void ConfigureOverHeadStatusWidget();
+
+    UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatGaugeVisibilityCheckUpdateGap = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="UI")
+	float HeadStatGaugeVisibilityRangeSquared = 10000000.f;
+	
+	FTimerHandle HeadStatGaugeVisibilityUpdatetimerHandle;
+
+	void UpdateHeadGaugeVisibility();
+	void SetStatusGaugeEnabled(bool bIsEnabled);
+	/********************************************************************/
+	/*                               Stun                               */
+	/********************************************************************/
+private:
+	UPROPERTY(EditDefaultsOnly, Category="Stun")
+	UAnimMontage* StunMontage;
+
+	virtual void OnStun();
+
+	virtual void OnRecoverFromStun();
+	/********************************************************************/
+	/*                        Death And Respawn                         */
+	/********************************************************************/
+public:
+	bool IsDead() const;
+	void RespawnImmediately();
+	
+private:
+	FTransform MeshRelativeTransform;
+	
+	UPROPERTY(EditAnywhere, Category="Death")
+    float DeathMontageFinishTimeShift = -0.8f;
+	 
+	UPROPERTY(EditAnywhere, Category="Death")
+    UAnimMontage* DeathMontage;
+
+	FTimerHandle DeathMontageTimerHandle;
+
+	void DeathMontageFinished();
+	void SetRagdollEnabled(bool bIsEnabled);
+
+	void PlayDeathAnimation();
+	
+	void StartDeathSequence();
+	void Respawn();
+
+	virtual void OnDead();
+	virtual void OnRespawn();
+
+	/********************************************************************/
+	/*                              Team                                */
+	/********************************************************************/
+public:
+	
+	/** Assigns Team Agent to given TeamID */
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override;
+	
+	/** Retrieve team identifier in form of FGenericTeamId */
+	virtual FGenericTeamId GetGenericTeamId() const override;
+private:
+	UPROPERTY(ReplicatedUsing = OnRep_TeamID)
+	FGenericTeamId TeamID;
+
+	UFUNCTION()
+	virtual void OnRep_TeamID();
+	/********************************************************************/
+	/*                              AI                                  */
+	/********************************************************************/
+private:
+	void SetAIPerceptionStimuliSourceEnabled(bool bIsEnabled);
+	UPROPERTY()
+	class UAIPerceptionStimuliSourceComponent* PerceptionStimuliSourceComponent;
+
+	
+};

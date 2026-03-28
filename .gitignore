@@ -1,0 +1,33 @@
+# keep
+# Source/
+# Config/
+# Crunch.uproject
+# .gitignore
+
+# ignore project assets / extra folders
+Content/
+Build/
+Coordinator/
+launchScripts/
+ServerDeploy/
+
+# unreal generated
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# IDE / solution
+.vs/
+.idea/
+.vsconfig
+*.sln
+*.sln.DotSettings.user
+*.suo
+*.user
+*.userprefs
+
+# system / logs
+*.log
+Thumbs.db
+.DS_Store
