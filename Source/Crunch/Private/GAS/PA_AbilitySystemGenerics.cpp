@@ -5,6 +5,11 @@
 
 const FRealCurve* UPA_AbilitySystemGenerics::GetExperienceCurve() const
 {
-	return ExperienceCurveTable->FindCurve(ExperienceRowName,"");
+	if (!ExperienceCurveTable || ExperienceRowName.IsNone())
+	{
+		return nullptr;
+	}
+
+	return ExperienceCurveTable->FindCurve(ExperienceRowName, TEXT(""));
 	
 }

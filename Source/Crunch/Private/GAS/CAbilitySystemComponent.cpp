@@ -26,61 +26,76 @@ UCAbilitySystemComponent::UCAbilitySystemComponent()
 
 void UCAbilitySystemComponent::InitializeBaseAttributes()
 {
-	if(!AbilitySystemGenerics || !AbilitySystemGenerics->GetBaseStatDataTable() || !GetOwner())
+	if(!GetOwner())
 	{
 		return;
 	}
 
-    const UDataTable* BaseStatDataTable = AbilitySystemGenerics->GetBaseStatDataTable();
+	const UDataTable* BaseStatDataTable = AbilitySystemGenerics ? AbilitySystemGenerics->GetBaseStatDataTable() : nullptr;
 	const FHeroBaseStats* BaseStats = nullptr;
 
-	for(const TPair<FName, uint8*>& DataPair : BaseStatDataTable->GetRowMap())
+	if (BaseStatDataTable)
 	{
-		BaseStats = BaseStatDataTable->FindRow<FHeroBaseStats>(DataPair.Key, "");
-		if(BaseStats && BaseStats->Class == GetOwner()->GetClass())
+		for (const TPair<FName, uint8*>& DataPair : BaseStatDataTable->GetRowMap())
 		{
-			break;
+			const FHeroBaseStats* Row = BaseStatDataTable->FindRow<FHeroBaseStats>(DataPair.Key, TEXT(""));
+			if (Row && Row->Class == GetOwner()->GetClass())
+			{
+				BaseStats = Row;
+				break;
+			}
 		}
 	}
 
-	if(BaseStats)
+	if (const ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner()))
+	{
+		if (const UCharacterMovementComponent* MovementComponent = OwnerCharacter->GetCharacterMovement())
+		{
+			const float MoveSpeed = (BaseStats && BaseStats->BaseMoveSpeed > 0.f)
+				? BaseStats->BaseMoveSpeed
+				: MovementComponent->MaxWalkSpeed;
+
+			const float MoveAcceleration = (BaseStats && BaseStats->BaseMoveAcceleration > 0.f)
+				? BaseStats->BaseMoveAcceleration
+				: MovementComponent->MaxAcceleration;
+
+			SetNumericAttributeBase(UCAttributeSet::GetMoveSpeedAttribute(), MoveSpeed);
+			SetNumericAttributeBase(UCAttributeSet::GetMoveAccelerationAttribute(), MoveAcceleration);
+		}
+	}
+
+	if (BaseStats)
 	{
 		SetNumericAttributeBase(UCAttributeSet::GetMaxHealthAttribute(), BaseStats->BaseMaxHealth);
 		SetNumericAttributeBase(UCAttributeSet::GetMaxManaAttribute(), BaseStats->BaseMaxMana);
 		SetNumericAttributeBase(UCAttributeSet::GetAttackDamageAttribute(), BaseStats->BaseAttackDamage);
 		SetNumericAttributeBase(UCAttributeSet::GetArmorAttribute(), BaseStats->BaseArmor);
-		SetNumericAttributeBase(UCAttributeSet::GetMoveSpeedAttribute(), BaseStats->BaseMoveSpeed);
-		if (const ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner()))
-		{
-			if (const UCharacterMovementComponent* MovementComponent = OwnerCharacter->GetCharacterMovement())
-			{
-				SetNumericAttributeBase(
-					UCAttributeSet::GetMoveAccelerationAttribute(),
-					MovementComponent->MaxAcceleration
-				);
-			}
-		}
-
-
-
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthAttribute(), BaseStats->Strength);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthGrowthRateAttribute(), BaseStats->StrengthGrowthRate);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceAttribute(), BaseStats->Intelligence);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetIntelligenceGrowthRateAttribute(), BaseStats->IntelligenceGrowthRate);
 	}
-	const FRealCurve* ExperienceCurve = AbilitySystemGenerics->GetExperienceCurve();
-	if(ExperienceCurve)
+
+	if (AbilitySystemGenerics)
 	{
-		int MaxLevel = ExperienceCurve->GetNumKeys();
-		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelAttribute(), MaxLevel);
+		const FRealCurve* ExperienceCurve = AbilitySystemGenerics ? AbilitySystemGenerics->GetExperienceCurve() : nullptr;
+		if (ExperienceCurve)
+		{
+			const int32 MaxLevel = ExperienceCurve->GetNumKeys();
+			SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelAttribute(), MaxLevel);
 
-		float MaxExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
-		SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxExp);
+			const float MaxExp = ExperienceCurve->GetKeyValue(ExperienceCurve->GetLastKeyHandle());
+			SetNumericAttributeBase(UCHeroAttributeSet::GetMaxLevelExperienceAttribute(), MaxExp);
 
-		UE_LOG(LogTemp, Warning, TEXT("Max Level is: %d, max experience is %f"), MaxLevel, MaxExp);
+			UE_LOG(LogTemp, Warning, TEXT("Max Level is: %d, max experience is %f"), MaxLevel, MaxExp);
+
+			Experienceupdated(FOnAttributeChangeData());
+		}
 	}
-	Experienceupdated(FOnAttributeChangeData()); 
+
+	Experienceupdated(FOnAttributeChangeData());
 }
+
 
 void UCAbilitySystemComponent::ServerSideInit()
 {
