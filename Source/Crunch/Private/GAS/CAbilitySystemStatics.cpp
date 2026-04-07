@@ -96,6 +96,11 @@ FGameplayTag UCAbilitySystemStatics::GetTargetUpdatedTag()
 	return FGameplayTag::RequestGameplayTag("target.updated"); 
 }
 
+FGameplayTag UCAbilitySystemStatics::GetGenericDamagePointTag()
+{
+	return FGameplayTag::RequestGameplayTag("ability.generic.damage");
+}
+
 bool UCAbilitySystemStatics::IsActorDead(const AActor* ActorToCheck)
 {
 	return ActorHasTag(ActorToCheck, GetDeadStatTag());

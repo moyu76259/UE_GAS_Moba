@@ -37,6 +37,7 @@ public:
 	static FGameplayTag GetGoldAttributeTag();
 	static FGameplayTag GetCrosshairTag();
 	static FGameplayTag GetTargetUpdatedTag();
+	static FGameplayTag GetGenericDamagePointTag();
 
 	static bool IsActorDead(const AActor* ActorToCheck);
 	static bool IsHero(const AActor* ActorToCheck);
@@ -51,6 +52,7 @@ public:
 	static float GetManaCostFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel);
 	static float GetCooldownDurationFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel);
 	static float GetCooldownRemainingFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
+	
 
 	/**
 	 * 在本地触发指定的游戏提示效果（如技能特效、攻击反馈等）
