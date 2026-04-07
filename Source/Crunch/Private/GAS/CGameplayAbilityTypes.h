@@ -75,4 +75,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float BaseMoveSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float BaseMoveAcceleration;
 };

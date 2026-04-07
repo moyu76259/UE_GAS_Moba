@@ -9,6 +9,10 @@
 #include "GAS/CHeroAttributeSet.h"
 #include "GAS/CAbilitySystemStatics.h"
 #include "GAS/PA_AbilitySystemGenerics.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 UCAbilitySystemComponent::UCAbilitySystemComponent()
 {
@@ -46,6 +50,18 @@ void UCAbilitySystemComponent::InitializeBaseAttributes()
 		SetNumericAttributeBase(UCAttributeSet::GetAttackDamageAttribute(), BaseStats->BaseAttackDamage);
 		SetNumericAttributeBase(UCAttributeSet::GetArmorAttribute(), BaseStats->BaseArmor);
 		SetNumericAttributeBase(UCAttributeSet::GetMoveSpeedAttribute(), BaseStats->BaseMoveSpeed);
+		if (const ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner()))
+		{
+			if (const UCharacterMovementComponent* MovementComponent = OwnerCharacter->GetCharacterMovement())
+			{
+				SetNumericAttributeBase(
+					UCAttributeSet::GetMoveAccelerationAttribute(),
+					MovementComponent->MaxAcceleration
+				);
+			}
+		}
+
+
 
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthAttribute(), BaseStats->Strength);
 		SetNumericAttributeBase(UCHeroAttributeSet::GetStrengthGrowthRateAttribute(), BaseStats->StrengthGrowthRate);

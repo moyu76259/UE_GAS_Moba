@@ -29,15 +29,25 @@ protected:
 	UFUNCTION()
 	FORCEINLINE bool ShouldDrawDebug() const { return bShouldDrawDebug; }
 
+	// 推动自己（如击退/击飞）
 	void PushSelf(const FVector& PushVel);
+	// 推动目标
 	void PushTarget(AActor* Target, const FVector& PushVel);
+	// 推动多个目标
 	void PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel);
+	// 推动TargetData中的所有目标
 	void PushTargets(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& PushVel);
+
+	// 从拥有者位置推动目标
+	void PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed);
+	void PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, float PushSpeed);
+
+	// 从指定位置推动目标
 	void PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle, const FVector& FromLocation, float PushSpeed);
 	void PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation, float PushSpeed);
 	void PlayMontageLocally(UAnimMontage* MontageToPlay);
 	void StopMontageAfterCurrentSection(UAnimMontage* MontageToStop);
-	FGenericTeamId GetOwnerteamId() const;
+	FGenericTeamId GetOwnerTeamId() const;
 
 	bool IsActorTeamAttitudeIs(const AActor* OtherActor, ETeamAttitude::Type TeamAttitude) const;
 

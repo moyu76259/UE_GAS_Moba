@@ -155,6 +155,7 @@ void UCGameplayAbility::PushTarget(AActor* Target, const FVector& PushVel)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Target, UGAP_Launched::GetLaunchedAbilityActiationTag(), EventData);
 }
 
+
 void UCGameplayAbility::PushTargets(const TArray<AActor*>& Targets, const FVector& PushVel)
 {
 	for(AActor* Target : Targets)
@@ -169,6 +170,23 @@ void UCGameplayAbility::PushTargets(const FGameplayAbilityTargetDataHandle& Targ
 	PushTargets(Targets, PushVel);
 }
 
+void UCGameplayAbility::PushTargetsFromOwnerLocation(const TArray<AActor*>& Targets, float PushSpeed)
+{
+	AActor* OwnerAvatarActor = GetAvatarActorFromActorInfo();
+	if (!OwnerAvatarActor)
+		return;
+
+	FVector OwnerAvatarActorLocation = OwnerAvatarActor->GetActorLocation();
+	PushTargetsFromLocation(Targets, OwnerAvatarActorLocation, PushSpeed);
+}
+
+void UCGameplayAbility::PushTargetsFromOwnerLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle,
+	float PushSpeed)
+{
+	TArray<AActor*> TargetActors = UAbilitySystemBlueprintLibrary::GetAllActorsFromTargetData(TargetDataHandle);
+	PushTargetsFromOwnerLocation(TargetActors, PushSpeed);
+}
+
 void UCGameplayAbility::PushTargetsFromLocation(const FGameplayAbilityTargetDataHandle& TargetDataHandle,
 	const FVector& FromLocation, float PushSpeed)
 {
@@ -179,10 +197,10 @@ void UCGameplayAbility::PushTargetsFromLocation(const FGameplayAbilityTargetData
 void UCGameplayAbility::PushTargetsFromLocation(const TArray<AActor*>& Targets, const FVector& FromLocation,
 	float PushSpeed)
 {
-	for(AActor* Target : Targets)
+	for (AActor* Target : Targets)
 	{
 		FVector PushDir = Target->GetActorLocation() - FromLocation;
-		PushDir.Z = 0;
+		PushDir.Z = 0; // 只在水平面上推开
 		PushDir.Normalize();
 
 		PushTarget(Target, PushDir * PushSpeed);
@@ -208,7 +226,7 @@ void UCGameplayAbility::StopMontageAfterCurrentSection(UAnimMontage* MontageToSt
 	}
 }
 
-FGenericTeamId UCGameplayAbility::GetOwnerteamId() const
+FGenericTeamId UCGameplayAbility::GetOwnerTeamId() const
 {
 	IGenericTeamAgentInterface* OwnerTeamInterface = Cast<IGenericTeamAgentInterface>(GetAvatarActorFromActorInfo());
 	if(OwnerTeamInterface)

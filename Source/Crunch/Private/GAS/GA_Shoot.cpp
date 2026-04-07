@@ -125,7 +125,7 @@ void UGA_Shoot::ShootProjecttile(FGameplayEventData Payload)
 		if(Projectile)
 		{
 			Projectile->ShootProjectile(ShootProjectileSpeed, ShootProjectileRange, GetAimTargetIfValid(),
-			GetOwnerteamId(), MakeOutgoingGameplayEffectSpec(ProjectileHitEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)));
+			GetOwnerTeamId(), MakeOutgoingGameplayEffectSpec(ProjectileHitEffect, GetAbilityLevel(CurrentSpecHandle, CurrentActorInfo)));
 		}
 	}
 }

@@ -20,6 +20,7 @@ FHeroBaseStats::FHeroBaseStats()
      BaseMaxMana {0.f},
      BaseAttackDamage {0.f},
      BaseArmor {0.f},
-     BaseMoveSpeed {0.f}
+     BaseMoveSpeed {0.f},
+     BaseMoveAcceleration{0.f}
 {
 }

@@ -91,7 +91,7 @@ void UGA_Blackhole::PlaceBlackhole(const FGameplayAbilityTargetDataHandle& Targe
 	ATA_Blackhole* BlackholeTargetActor = Cast<ATA_Blackhole>(TargetActor);
 	if(BlackholeTargetActor)
 	{
-		BlackholeTargetActor->ConfigureBlackhole(TargetAreaRadius, BlackholePullSpeed, BlackholeDuration, GetOwnerteamId());
+		BlackholeTargetActor->ConfigureBlackhole(TargetAreaRadius, BlackholePullSpeed, BlackholeDuration, GetOwnerTeamId());
 	}
 	BlackholeTargettingTask->FinishSpawningActor(this, TargetActor);
 	if(BlackholeTargetActor)

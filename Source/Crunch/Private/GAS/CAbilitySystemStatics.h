@@ -51,5 +51,13 @@ public:
 	static float GetManaCostFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel);
 	static float GetCooldownDurationFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC, int AbilityLevel);
 	static float GetCooldownRemainingFor(const UGameplayAbility* AbilityCDO, const UAbilitySystemComponent& ASC);
-	
+
+	/**
+	 * 在本地触发指定的游戏提示效果（如技能特效、攻击反馈等）
+	 * 
+	 * @param CueTargetActor 触发游戏提示的目标Actor（如角色、技能释放者）
+	 * @param HitResult 包含命中位置、法线等碰撞信息的结果对象
+	 * @param GameplayCueTag 标识游戏提示类型的GameplayTag（如"Ability.Attack.Basic"）
+	 */
+	static void SendLocalGameplayCue(AActor* CueTargetActor, const FHitResult& HitResult, const FGameplayTag& GameplayCueTag);
 };

@@ -14,13 +14,11 @@
 void UGA_Lazer::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	//激光技能一开始不会直接生效，而是先做一次 GAS 层面的合法性检查，并确保动画资源存在。只有通过后才继续执行。
 	if(!K2_CommitAbility() || !LazerMontage)
 	{
 		K2_EndAbility();
 		return;
 	}
-	//考虑了服务端/预测执行的问题,GAS 允许在有 authority 或 prediction key 的情况下执行
 	if(HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
 		UAbilityTask_PlayMontageAndWait* PlayerLazerMontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, LazerMontage);
@@ -78,7 +76,7 @@ void UGA_Lazer::ShootLazer(FGameplayEventData Payload)
 	ATargetActor_Line* LineTargetActor = Cast<ATargetActor_Line>(TargetActor);
 	if(LineTargetActor)
 	{
-		LineTargetActor->ConfigureTargetSetting(TargetRange, DetectionCylinderRadius, TargetingInterval, GetOwnerteamId(), ShouldDrawDebug());
+		LineTargetActor->ConfigureTargetSetting(TargetRange, DetectionCylinderRadius, TargetingInterval, GetOwnerTeamId(), ShouldDrawDebug());
 	}
 	WaitDamageTargetTask->FinishSpawningActor(this, TargetActor);
 	
