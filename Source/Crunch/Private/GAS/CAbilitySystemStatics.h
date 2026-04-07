@@ -38,6 +38,7 @@ public:
 	static FGameplayTag GetCrosshairTag();
 	static FGameplayTag GetTargetUpdatedTag();
 	static FGameplayTag GetGenericDamagePointTag();
+	static FGameplayTag GetBlinkTeleportTag();
 
 	static bool IsActorDead(const AActor* ActorToCheck);
 	static bool IsHero(const AActor* ActorToCheck);

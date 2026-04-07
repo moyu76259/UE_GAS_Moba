@@ -101,6 +101,11 @@ FGameplayTag UCAbilitySystemStatics::GetGenericDamagePointTag()
 	return FGameplayTag::RequestGameplayTag("ability.generic.damage");
 }
 
+FGameplayTag UCAbilitySystemStatics::GetBlinkTeleportTag()
+{
+	return FGameplayTag::RequestGameplayTag("ability.blink.teleport");
+}
+
 bool UCAbilitySystemStatics::IsActorDead(const AActor* ActorToCheck)
 {
 	return ActorHasTag(ActorToCheck, GetDeadStatTag());
