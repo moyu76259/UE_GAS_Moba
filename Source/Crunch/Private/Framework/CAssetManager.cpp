@@ -43,6 +43,18 @@ void UCAssetManager::LoadShopItems(const FStreamableDelegate& LoadFinishedCallba
 
 bool UCAssetManager::GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) const
 {
+	if(LoadedShopItems.Num() > 0)
+	{
+		for(UPA_ShopItem* LoadedItem : LoadedShopItems)
+		{
+			if(LoadedItem)
+			{
+				OutItems.Add(LoadedItem);
+			}
+		}
+		return OutItems.Num() > 0;
+	}
+
 	TArray<UObject*> LoadedObjects;
 	bool bLoaded = GetPrimaryAssetObjectList(UPA_ShopItem::GetShopItemAssetType(), LoadedObjects);
 
@@ -50,7 +62,10 @@ bool UCAssetManager::GetLoadedShopItems(TArray<const UPA_ShopItem*>& OutItems) c
 	{
 		for(UObject* ObjectLoaded : LoadedObjects)
 		{
-			OutItems.Add(Cast<UPA_ShopItem>(ObjectLoaded));
+			if(UPA_ShopItem* LoadedItem = Cast<UPA_ShopItem>(ObjectLoaded))
+			{
+				OutItems.Add(LoadedItem);
+			}
 		}
 	}
 	return bLoaded;
@@ -68,6 +83,18 @@ const FItemCollection* UCAssetManager::GetIngredientForItem(const UPA_ShopItem* 
 
 void UCAssetManager::ShopItemLoadFinished(const FStreamableDelegate Callback)
 {
+	LoadedShopItems.Reset();
+
+	TArray<const UPA_ShopItem*> ShopItems;
+	if(GetLoadedShopItems(ShopItems))
+	{
+		LoadedShopItems.Reserve(ShopItems.Num());
+		for(const UPA_ShopItem* ShopItem : ShopItems)
+		{
+			LoadedShopItems.Add(const_cast<UPA_ShopItem*>(ShopItem));
+		}
+	}
+
 	Callback.ExecuteIfBound();
 	BuildItemMaps();
 }

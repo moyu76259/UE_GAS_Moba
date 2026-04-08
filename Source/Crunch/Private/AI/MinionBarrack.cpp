@@ -74,6 +74,11 @@ void AMinionBarrack::SpawnNewGroup()
 
 void AMinionBarrack::SpawnNewMinions(int Amt)
 {
+	if(!GetWorld() || !MinionClass)
+	{
+		return;
+	}
+
 	for(int i = 0;i < Amt; i++)
 	{
 		FTransform SpawnTransform = GetActorTransform();
@@ -84,6 +89,10 @@ void AMinionBarrack::SpawnNewMinions(int Amt)
 
 		AMinion* NewMinion = GetWorld()->SpawnActorDeferred<AMinion>(MinionClass,SpawnTransform,this,nullptr,
 			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+		if(!IsValid(NewMinion))
+		{
+			continue;
+		}
 
 		NewMinion->SetGenericTeamId(BarrackTeamId);
         NewMinion->FinishSpawning(SpawnTransform);
@@ -98,6 +107,11 @@ AMinion* AMinionBarrack::GetNextAvaliableMinion() const
 {
 	for(AMinion* Minion : MinionPool)
 	{
+		if(!IsValid(Minion) || !Minion->GetAbilitySystemComponent())
+		{
+			continue;
+		}
+
 		if(!Minion->IsActive())
 		{
 			return Minion;

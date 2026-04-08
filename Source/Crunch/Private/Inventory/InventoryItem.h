@@ -82,10 +82,15 @@ public:
 	
 private:
 	void ApplyGASModifications();
-	UAbilitySystemComponent* OwnerAbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> OwnerAbilitySystemComponent;
+
     void ManaUpdated(const FOnAttributeChangeData& ChangeData);
-	
-	const UPA_ShopItem* ShopItem;
+
+	UPROPERTY()
+	TObjectPtr<UPA_ShopItem> ShopItem;
+
 	FInventoryItemHandle Handle;
 	int StackCount;
 	int Slot;

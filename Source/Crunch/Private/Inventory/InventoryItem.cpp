@@ -103,7 +103,7 @@ void UInventoryItem::InitItem(const FInventoryItemHandle& NewHandle, const UPA_S
 	UAbilitySystemComponent* AbilitySystemComponent)
 {
 	Handle = NewHandle;
-	ShopItem = NewShopItem;
+	ShopItem = const_cast<UPA_ShopItem*>(NewShopItem);
 
 	OwnerAbilitySystemComponent = AbilitySystemComponent;
 	if(OwnerAbilitySystemComponent)

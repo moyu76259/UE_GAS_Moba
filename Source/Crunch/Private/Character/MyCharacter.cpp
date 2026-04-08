@@ -278,13 +278,26 @@ void AMyCharacter::OnRecoverFromStun()
 
 bool AMyCharacter::IsDead() const
 {
-	return GetAbilitySystemComponent()->HasMatchingGameplayTag(UCAbilitySystemStatics::GetDeadStatTag());
+	const UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent();
+	if(!IsValid(AbilitySystemComponent))
+	{
+		return false;
+	}
+
+	return AbilitySystemComponent->HasMatchingGameplayTag(UCAbilitySystemStatics::GetDeadStatTag());
 }
 
 void AMyCharacter::RespawnImmediately()
 {
-	if(HasAuthority())
-		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(UCAbilitySystemStatics::GetDeadStatTag()));
+	if(!HasAuthority())
+	{
+		return;
+	}
+
+	if(UAbilitySystemComponent* AbilitySystemComponent = GetAbilitySystemComponent())
+	{
+		AbilitySystemComponent->RemoveActiveEffectsWithGrantedTags(FGameplayTagContainer(UCAbilitySystemStatics::GetDeadStatTag()));
+	}
 }
 
 void AMyCharacter::DeathMontageFinished()

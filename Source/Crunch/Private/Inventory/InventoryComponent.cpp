@@ -148,7 +148,7 @@ void UInventoryComponent::TryActivateItemInSlot(int SlotNumber)
 {
 	for(TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
 	{
-		if(ItemPair.Value->GetItemSlot() == SlotNumber)
+		if(ItemPair.Value && ItemPair.Value->GetItemSlot() == SlotNumber)
 		{
 			Server_ActivateItem(ItemPair.Key);
 			return;
@@ -183,7 +183,7 @@ void UInventoryComponent::AbilityCommitted(UGameplayAbility* CommittedAbility)
 	);
 	for(TPair<FInventoryItemHandle, UInventoryItem*>& ItemPair : InventoryMap)
 	{
-		if(!ItemPair.Value)
+		if(!ItemPair.Value || !ItemPair.Value->GetShopItem())
 			continue;
 
 		if(ItemPair.Value->IsGrantintAbility(CommittedAbility->GetClass()))
@@ -201,7 +201,7 @@ void UInventoryComponent::Server_ActivateItem_Implementation(FInventoryItemHandl
 
 	InventoryItem->TryActivateGrantedAbility();
 	const UPA_ShopItem* Item = InventoryItem->GetShopItem();
-	if(Item->GetIsConsumable())
+	if(Item && Item->GetIsConsumable())
 	{
 		ConsumeItem(InventoryItem);
 	}
@@ -244,7 +244,7 @@ void UInventoryComponent::GrantItem(const UPA_ShopItem* NewItem)
 		if(TryItemCombination(NewItem))
 			return;
 			
-		UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+		UInventoryItem* InventoryItem = NewObject<UInventoryItem>(this);
 		FInventoryItemHandle NewHandle = FInventoryItemHandle::CreateHandle();	
 		InventoryItem->InitItem(NewHandle, NewItem, OwnerAbilitySystemComponent);
 		InventoryMap.Add(NewHandle, InventoryItem);
@@ -347,7 +347,7 @@ void UInventoryComponent::Client_ItemAdded_Implementation(FInventoryItemHandle A
 	if(GetOwner()->HasAuthority())
 		return;
 	
-	UInventoryItem* InventoryItem = NewObject<UInventoryItem>();
+	UInventoryItem* InventoryItem = NewObject<UInventoryItem>(this);
 	InventoryItem->InitItem(AssignedHandle, Item, OwnerAbilitySystemComponent);
 	InventoryItem->SetGrantedAbilitSpecHandle(GrantedAbilitySpecHandle);
 	InventoryMap.Add(AssignedHandle, InventoryItem);

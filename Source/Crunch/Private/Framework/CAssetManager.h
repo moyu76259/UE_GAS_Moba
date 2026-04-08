@@ -36,5 +36,8 @@ private:
 
 	UPROPERTY()
 	TMap<const UPA_ShopItem*, FItemCollection> IngredientMap;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UPA_ShopItem>> LoadedShopItems;
 	
 };
